@@ -43,7 +43,7 @@ router.route('/:short_code')
 			if(err){
 				res.send(err)
 			}
-			window.location.href = url.long_url;		
+			res.redirect(301, url.long_url);
 		})
 	})
 
