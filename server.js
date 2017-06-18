@@ -13,6 +13,8 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080;
 
 var router = express.Router();
+// var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+var regex = new RegExp(/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi);
 var longHash = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 function hash(){
 	var new_list = "";
@@ -21,18 +23,26 @@ function hash(){
 	}
 	return new_list
 }
+function searchUrl(){
 
+}
 router.route('/url')
 	.post(function(req, res){
+		if((req.body.url).match(regex)){
+		console.log(regex);
 		var url = new Url();
 		url.long_url = req.body.url;
 		url.shortCode = hash()
-		url.save(function(err, url){
-			if(err){
-				resa.send(err)
-			}
-			res.json("Your Shorten Url: " + url.shortCode)
-		})
+
+			url.save(function(err, url){
+				if(err){
+					res.send(err)
+				}
+				res.json("Your Shorten Url: " + url.shortCode)
+			})
+		} else {
+			res.json("This is an invalid url")
+		}
 	})
 
 router.route('/:short_code')
@@ -43,10 +53,10 @@ router.route('/:short_code')
 			if(err){
 				res.send(err)
 			}
-			res.json(url[0]["long_url"]);
-			// res.redirect(301, url.long_url);
+			res.redirect(301, url[0]["long_url"]);
 		})
 	})
+
 
 
 app.use('/api', router);
